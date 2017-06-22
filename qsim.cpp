@@ -265,6 +265,10 @@ const char** get_qemu_args(const char* kernel, int ram_size, int n_cpus, const s
     "-append", "init=/init lpj=34920500 console=ttyS0 console=/dev/ttyS0 notsc"
     " nowatchdog rcupdate.rcu_cpu_stall_suppress=1",
     "-nographic",
+    /*
+    "-icount", "1,sleep=off",
+    "-rtc", "clock=vm",
+    */
     "-smp", ncpus,
     (mode == QSIM_KVM) ? "--enable-kvm" : NULL,
     NULL
@@ -423,8 +427,8 @@ void Qsim::OSDomain::init(const char* filename)
     exit(1);
   }
 
-  // allocate space for args + incoming fd(2) + icount(2)
-  char **cmd_args = (char **)malloc((argc+5)*sizeof(char*));
+  // allocate space for args + incoming fd(2) + icount(2) + clock(2)
+  char **cmd_args = (char **)malloc((argc+7)*sizeof(char*));
 
   // go to the beginning of the arg list
   cmd_file.clear();
@@ -439,10 +443,12 @@ void Qsim::OSDomain::init(const char* filename)
   cmd_args[argc+1] = fd_arg;
   cmd_args[argc+2] = strdup("-icount");
   if (arch == "x86")
-      cmd_args[argc+3] = strdup("1,sleep=off");
+      cmd_args[argc+3] = strdup("7,sleep=off");
   else
       cmd_args[argc+3] = strdup("7,sleep=off");
-  cmd_args[argc+4] = NULL;
+  cmd_args[argc+4]= strdup("-rtc");
+  cmd_args[argc+5]= strdup("clock=vm");
+  cmd_args[argc+6] = NULL;
 
   cmd_argv = (const char **)cmd_args;
 
