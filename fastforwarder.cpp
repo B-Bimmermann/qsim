@@ -83,7 +83,8 @@ int main(int argc, char** argv) {
 #ifndef LOAD
   osd.set_magic_cb(&magic_cb_s, &Magic_cb_s::magic_cb_f);
 
-  std::cout << "Fast forwarding...\n";
+  std::cout << "Fast forwarding..."  << std::endl;
+
 
   // The thread will be "idle" during initialization. The "slow cycles"
   // mechanism is a dirty hack that keeps timer interrupts from happening
@@ -129,7 +130,7 @@ int main(int argc, char** argv) {
     ran = osd.run(runfor);
   }
 
-  std::cout << "Finished.\n";
+  std::cout << "Finished." << std::endl;
   
   return 0;
 }
