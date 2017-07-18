@@ -5,7 +5,7 @@
 #
 # Author: Pranith Kumar
 # Date: 01/05/2016
-# Usage: ./setup.sh {arm64}
+# Usage: ./setup.sh arm64
 
 bold=$(tput bold)
 normal=$(tput sgr0)
@@ -14,6 +14,8 @@ ARCH=arm64
 # build qemu
 #echo -e "\n\nCLEAN QEMU"
 #rm -fr .dbg_build/
+#make clean
+
 echo -e "\n\nBuilding QEMU"
 ./build-qemu.sh debug
 
