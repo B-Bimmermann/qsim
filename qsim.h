@@ -245,7 +245,7 @@ namespace Qsim {
     enum cpu_prot { PROT_KERN, PROT_USER };
 
     // Create a OSDomain with n CPUs, booting the kernel at the given path
-    OSDomain(uint16_t n, std::string kernel_path, const std::string& cpu_type, qsim_mode mode = QSIM_HEADLESS, unsigned ram_mb = 1024);
+    OSDomain(uint16_t n, std::string kernel_path, const std::string& cpu_type, qsim_mode mode = QSIM_HEADLESS, unsigned ram_mb = 1024, std::string device_tree_path = "");
 
     // Create a new OSDomain from a state file.
     OSDomain(const char *filename);
@@ -667,6 +667,7 @@ namespace Qsim {
     int id;
     int bench_pid;
     void assign_id();
+    std::string device_tree_path;
 
     void init(const char* filename);
 

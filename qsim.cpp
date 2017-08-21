@@ -67,7 +67,7 @@ string get_qemu_lib(string cpu_type = "x86") {
   string outstr;
 
   string suffix;
-  if (cpu_type == "a64")
+  if (cpu_type == "a64" or cpu_type == "xilinx_zcu102")
     suffix = "/lib/libqemu-qsim-a64.so";
   else
     suffix = "/lib/libqemu-qsim-x86.so";
@@ -294,6 +294,50 @@ const char** get_qemu_args(const char* kernel, int ram_size, int n_cpus, const s
     NULL
   };
 
+
+
+  string bl31_path_s       = "loader,file=" + kernel_s + "/images/linux/bl31.elf,cpu-num=0";
+  kernel_path_s            = "loader,file=" + kernel_s + "/images/linux/Image,addr=0x00080000";
+  string bootloader_path_s = "loader,file=" + kernel_s + "/build/misc/linux-boot/linux-boot.elf";
+
+  // REMOVE ME !!!
+  string test = "/home/bimmermann/Masterarbeit/TEST/qemu-devicetrees/";
+
+  string hw_dtb_path_s     = test + "/LATEST/SINGLE_ARCH/zcu102-arm.dtb";
+  string dtb_path_s        = kernel_s + "/images/linux/system.dtb";
+  disk_path_s              = kernel_s + "/images/linux/nand0.qcow2";
+
+  char* bl31_path       = strdup(bl31_path_s.c_str());
+  char* bootloader_path = strdup(bootloader_path_s.c_str());
+  kernel_path           = strdup(kernel_path_s.c_str());
+  char* dtb_path        = strdup(dtb_path_s.c_str());
+  char* dtb_loader_path = strdup(("loader,file=" + dtb_path_s + ",addr=0x04080000").c_str());
+  char* hw_dtb_path     = strdup(hw_dtb_path_s.c_str());
+  disk_path             = strdup(disk_path_s.c_str());  
+  static const char *argv_headless_xilinx_zcu102[] = {
+    "qemu",
+    "-M", "arm-generic-fdt",
+    "-m", "4G",
+    "-global", "xlnx,zynqmp-boot.cpu-num=0",
+    "-global", "xlnx,zynqmp-boot.use-pmufw=true",
+    "-device", "loader,addr=0xfd1a0104,data=0x8000000e,data-len=4",
+    "-device", bl31_path,
+    "-device", kernel_path,
+    "-device", dtb_loader_path,
+    "-device", bootloader_path,
+    "-hw-dtb", hw_dtb_path,
+    "-dtb", dtb_path,
+    "-pflash", disk_path,
+    "-nographic",
+    "-no-reboot",
+    "-localtime",
+    "--serial", "mon:stdio",
+    "--serial", "/dev/null",
+    (mode == QSIM_KVM) ? "--enable-kvm" : NULL,
+    NULL
+  };
+
+
   if (mode == QSIM_INTERACTIVE) {
     if (cpu_type == "x86")
       return argv_interactive_x86;
@@ -306,16 +350,19 @@ const char** get_qemu_args(const char* kernel, int ram_size, int n_cpus, const s
       return argv_headless_x86;
     else if (cpu_type == "a64")
       return argv_headless_a64;
+    else if (cpu_type == "xilinx_zcu102")
+      return argv_headless_xilinx_zcu102;
   }
 
   return NULL;
 }
 
 Qsim::QemuCpu::QemuCpu(int id, const char* kernel, unsigned ram_mb,
-		                   int n_cpus, const string& type, qsim_mode mode)
+                                   int n_cpus, const string& type, qsim_mode mode)
 {
   std::ostringstream ram_size_ss; ram_size_ss << ram_mb << 'M';
   cpu_type = type;
+
 
   // Load the library file and get pointers
   load_and_grab_pointers(get_qemu_lib(cpu_type).c_str());
@@ -323,10 +370,10 @@ Qsim::QemuCpu::QemuCpu(int id, const char* kernel, unsigned ram_mb,
   const char **cmd_argv = get_qemu_args(kernel, ram_mb, n_cpus, type, mode);
 
   // print the Qemu args
-  /*
+  
   for(unsigned int i=0;cmd_argv[i]!=NULL;i++)
       std::cout << "argv[" << i << "] = " << cmd_argv[i] << std::endl;
-  */
+  
 
   // Initialize Qemu library
   qemu_init(cmd_argv);
@@ -363,12 +410,13 @@ void Qsim::OSDomain::assign_id() {
 }
 
 Qsim::OSDomain::OSDomain(uint16_t n, string kernel_path, const string& cpu_type,
-                         qsim_mode mode_arg, unsigned ram_mb)
+                         qsim_mode mode_arg, unsigned ram_mb, std::string device_tree_path)
   : n_cpus(n), waiting_for_eip(0), mode(mode_arg)
 {
   assign_id();
 
   ram_size_mb = ram_mb;
+  device_tree_path = device_tree_path;
 
   if (n > 0) {
     // Create a master CPU using the given kernel

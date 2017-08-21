@@ -54,14 +54,21 @@ struct Magic_cb_s {
 int main(int argc, char** argv) {
   if (argc < 5) {
     std::cout << "Usage:\n  " << argv[0] 
-              << " <bzImage> <# CPUs> <ram size (MB)> <output state file> <{x86/a64}>\n";
+              << " <bzImage> <# CPUs> <ram size (MB)> <output state file> <{x86/a64/xilinx_zcu102}>\n";
     return 1;
   }
 
   std::string arch("x86");
 
-  if (argc == 6)
+  if (argc >= 6)
       arch = argv[5];
+
+  if (arch == "xilinx_zcu102")
+     if (argc < 7) {
+	    std::cout << "Usage:\n  " << argv[0] 
+              << " <Petalinux_Project_Folder> <# CPUs> <ram size (MB)> <output state file> xilinx_zcu102 <xilinx_device_trees>" << std::endl;
+	    return 1;
+     }
 
   int cpus(atoi(argv[2])), ram_mb(atoi(argv[3]));
   if (cpus <= 0) {
@@ -75,7 +82,10 @@ int main(int argc, char** argv) {
 #ifdef LOAD
   Qsim::OSDomain osd("state.debug");
 #else
-  Qsim::OSDomain osd(cpus, argv[1], arch, QSIM_HEADLESS, ram_mb);
+//  if (arch != "xilinx_zcu102")
+//    Qsim::OSDomain osd(cpus, argv[1], arch, QSIM_HEADLESS, ram_mb);
+//  else
+    Qsim::OSDomain osd(cpus, argv[1], arch, QSIM_HEADLESS, ram_mb, argv[6]);
 #endif
   Magic_cb_s magic_cb_s(osd);
 
