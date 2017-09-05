@@ -29,7 +29,7 @@ class Statesaver;
 
 class Statesaver {
 public:
-  Statesaver(Qsim::OSDomain &_osd, const char* state_filename):
+  Statesaver(Qsim::OSDomain &_osd, const char* state_filename,sem_t * has_saved = NULL ):
     osd(_osd), last_was_br(_osd.get_n()), last_was_cbr(_osd.get_n())
   {
     Qsim::OSDomain::inst_cb_handle_t icb_handle;
@@ -38,7 +38,7 @@ public:
     icb_handle = osd.set_inst_cb(this, &Statesaver::inst_cb);
     rcb_handle = osd.set_reg_cb(this, &Statesaver::reg_cb);
 
-    osd.save_state(state_filename);
+    osd.save_state(state_filename,has_saved);
 
     // Unset the callbacks so we can continue.
     osd.unset_inst_cb(icb_handle);
@@ -76,6 +76,8 @@ void Statesaver::reg_cb(int cpu, int r, uint8_t s, int t) {
   if (last_was_br[cpu] && s == 0 && !t) last_was_cbr[cpu] = true;
 }
 
-void Qsim::save_state(Qsim::OSDomain &osd, const char *filename) {
-  Statesaver ss(osd, filename);
+
+void Qsim::save_state(Qsim::OSDomain &osd, const char *filename, sem_t * has_saved) {
+  Statesaver ss(osd, filename, has_saved);
 }
+

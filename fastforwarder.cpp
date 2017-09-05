@@ -13,6 +13,8 @@
 #include <cstdlib>
 #include <vector>
 #include "statesaver.h"
+#include <semaphore.h>
+
 
 // The following two defines can be used to create instruction traces. DEBUG
 // enables tracing and LOAD reconfigures the fastforwarder to load a state
@@ -82,10 +84,10 @@ int main(int argc, char** argv) {
 #ifdef LOAD
   Qsim::OSDomain osd("state.debug");
 #else
-//  if (arch != "xilinx_zcu102")
-//    Qsim::OSDomain osd(cpus, argv[1], arch, QSIM_HEADLESS, ram_mb);
-//  else
-    Qsim::OSDomain osd(cpus, argv[1], arch, QSIM_HEADLESS, ram_mb, argv[6]);
+  std::string device_tree_path;
+  if (arch == "xilinx_zcu102")
+    device_tree_path = argv[6];
+  Qsim::OSDomain osd(cpus, argv[1], arch, QSIM_HEADLESS, ram_mb, device_tree_path);
 #endif
   Magic_cb_s magic_cb_s(osd);
 
@@ -127,17 +129,22 @@ int main(int argc, char** argv) {
 
 #ifndef LOAD
   std::cout << "Saving state...\n";
-  Qsim::save_state(osd, argv[4]);
+  sem_t has_saved;
+  sem_init(&has_saved, 0, 0);
+  Qsim::save_state(osd, argv[4],&has_saved);
 #endif
-
 #ifdef DEBUG
   std::cout << "Tracing 1M instructions.\n";
 #endif
 
-  int runfor = 10000, ran = runfor;
-  while (ran == runfor) {
-    ran = osd.run(runfor);
+#ifndef LOAD
+  int value = 0;
+  while (value == 0) {
+    osd.run(100);
+    sem_getvalue(&has_saved, &value);
   }
+   sem_destroy(&has_saved);
+#endif
 
   std::cout << "Finished.\n";
   

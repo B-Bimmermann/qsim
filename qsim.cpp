@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <semaphore.h>
+
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -301,7 +303,7 @@ const char** get_qemu_args(const char* kernel, int ram_size, int n_cpus, const s
   string bootloader_path_s = "loader,file=" + kernel_s + "/build/misc/linux-boot/linux-boot.elf";
 
   // REMOVE ME !!!
-  string test = "/home/bimmermann/Masterarbeit/TEST/qemu-devicetrees/";
+  string test = "/home/bimmermann/Masterarbeit/GITHUB-AREX/qemu-devicetrees";
 
   string hw_dtb_path_s     = test + "/LATEST/SINGLE_ARCH/zcu102-arm.dtb";
   string dtb_path_s        = kernel_s + "/images/linux/system.dtb";
@@ -317,7 +319,7 @@ const char** get_qemu_args(const char* kernel, int ram_size, int n_cpus, const s
   static const char *argv_headless_xilinx_zcu102[] = {
     "qemu",
     "-M", "arm-generic-fdt",
-    "-m", "4G",
+    "-m", ramsize,
     "-global", "xlnx,zynqmp-boot.cpu-num=0",
     "-global", "xlnx,zynqmp-boot.use-pmufw=true",
     "-device", "loader,addr=0xfd1a0104,data=0x8000000e,data-len=4",
@@ -392,9 +394,9 @@ Qsim::QemuCpu::QemuCpu(const char** cmd_argv, const string& type)
   qemu_init(cmd_argv);
 }
 
-void Qsim::QemuCpu::save_state(const char *filename)
+void Qsim::QemuCpu::save_state(const char *filename, sem_t * has_saved)
 {
-  qsim_savevm_state(filename);
+  qsim_savevm_state(filename,has_saved);
 }
 
 Qsim::QemuCpu::~QemuCpu() {
@@ -532,8 +534,8 @@ Qsim::OSDomain::OSDomain(int n, const char* filename)
   }
 }
 
-void Qsim::OSDomain::save_state(const char* filename) {
-  cpus[0]->save_state(filename);
+void Qsim::OSDomain::save_state(const char* filename, sem_t * has_saved) {
+  cpus[0]->save_state(filename,has_saved);
 
   string cmd_filename = string(filename) + string(".cmd");
   ofstream cmd_file(cmd_filename);

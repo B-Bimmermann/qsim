@@ -10,9 +10,10 @@
 #define __STATESAVER_H
 
 #include <qsim.h>
+#include <semaphore.h>
 
 namespace Qsim {
-  void save_state(Qsim::OSDomain &osd, const char *filename);
-};
+  void save_state(Qsim::OSDomain &osd, const char *filename, sem_t * has_saved = NULL);
+}
 
 #endif

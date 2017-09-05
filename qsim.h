@@ -15,6 +15,7 @@
 #include <queue>
 #include <stdint.h>
 #include <string.h>
+#include <semaphore.h>
 
 #include "qsim-vm.h"
 #include "qsim-regs.h"
@@ -137,7 +138,7 @@ namespace Qsim {
     uint8_t  (*qemu_mem_rd_virt) (int c, uint64_t vaddr);
     void     (*qemu_mem_wr_virt) (int c, uint64_t vaddr, uint8_t data);
 
-    int      (*qsim_savevm_state) (const char *filename);
+    int      (*qsim_savevm_state) (const char *filename, sem_t * has_saved);
     int      (*qsim_loadvm_state) (const char *filename);
 
     void load_and_grab_pointers(const char *libfile);
@@ -157,7 +158,7 @@ namespace Qsim {
     void setCpuType(std::string arch) { cpu_type = arch; }
 
     // Save state to file.
-    void save_state(const char *file);
+    void save_state(const char *file, sem_t *has_saved = NULL);
 
     virtual void set_atomic_cb(atomic_cb_t cb) { 
       qemu_set_atomic_cb(cb); 
@@ -253,7 +254,7 @@ namespace Qsim {
 
     // Save a snapshot of the OSDomain state
     void save_state(std::ostream &outfile);
-    void save_state(const char* filename);
+    void save_state(const char* filename,sem_t * has_saved = NULL);
 
     // Get the current mode, protection ring, or Linux task ID for CPU i
     int           get_tid (uint16_t i);
