@@ -114,6 +114,7 @@ a64_tests: a64_prep
 
 clean:
 	rm -f *~ \#*\# libqsim.so *.o test qtm qsim-fastforwarder build
+	rm -fr lib/
 
 distclean: clean
 	rm -rf .dbg_build .opt_build
