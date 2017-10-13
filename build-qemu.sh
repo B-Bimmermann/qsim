@@ -9,7 +9,7 @@ fi
 
 if [[ $1 = "debug" ]]; then
   echo "make debug"
-  debug_flags="--enable-debug --enable-debug-tcg --enable-debug-info"
+  debug_flags="--enable-debug --enable-debug-tcg --enable-debug-info --disable-strip --disable-pie"
   build_dir=.dbg_build
 fi
 
