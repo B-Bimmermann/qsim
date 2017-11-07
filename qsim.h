@@ -147,7 +147,7 @@ namespace Qsim {
     void load_linux(const char* bzImage);
 
   public:
-    QemuCpu(int id, const char* kernel, unsigned ram_mb = 1024, int n_cpus = 1, const std::string& cpu_type = "x86", qsim_mode mode = QSIM_HEADLESS);
+    QemuCpu(int id, const char* kernel, unsigned ram_mb = 1024, int n_cpus = 1, const std::string& cpu_type = "x86", qsim_mode mode = QSIM_HEADLESS,const std::string& shared_folder_dir_path = "");
     QemuCpu(const char** args, const std::string& type);
     virtual ~QemuCpu();
  
@@ -246,7 +246,7 @@ namespace Qsim {
     enum cpu_prot { PROT_KERN, PROT_USER };
 
     // Create a OSDomain with n CPUs, booting the kernel at the given path
-    OSDomain(uint16_t n, std::string kernel_path, const std::string& cpu_type, qsim_mode mode = QSIM_HEADLESS, unsigned ram_mb = 1024, std::string device_tree_path = "");
+    OSDomain(uint16_t n, std::string kernel_path, const std::string& cpu_type, qsim_mode mode = QSIM_HEADLESS, unsigned ram_mb = 1024, std::string qemu_shared_folder_dir_path = "");
 
     // Create a new OSDomain from a state file.
     OSDomain(const char *filename);
@@ -668,8 +668,6 @@ namespace Qsim {
     int id;
     int bench_pid;
     void assign_id();
-    std::string device_tree_path;
-
     void init(const char* filename);
 
     std::string linebuf;
@@ -715,6 +713,8 @@ namespace Qsim {
     static std::vector<OSDomain *> osdomains;
 
     qsim_mode mode;
+    std::string shared_folder_dir;
+
 
     // save the current VM arguments
     const char **cmd_argv;

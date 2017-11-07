@@ -65,10 +65,10 @@ int main(int argc, char** argv) {
   if (argc >= 6)
       arch = argv[5];
 
-  if (arch == "xilinx_zcu102")
+  if (arch == "xilinx_zcu102" or  arch == "xilinx_zcu102_old" )
      if (argc < 7) {
 	    std::cout << "Usage:\n  " << argv[0] 
-              << " <Petalinux_Project_Folder> <# CPUs> <ram size (MB)> <output state file> xilinx_zcu102 <xilinx_device_trees>" << std::endl;
+              << " <Petalinux_Project_Folder> <# CPUs> <ram size (MB)> <output state file> xilinx_zcu102 <qemu_shared_folder>" << std::endl;
 	    return 1;
      }
 
@@ -84,10 +84,10 @@ int main(int argc, char** argv) {
 #ifdef LOAD
   Qsim::OSDomain osd("state.debug");
 #else
-  std::string device_tree_path;
-  if (arch == "xilinx_zcu102")
-    device_tree_path = argv[6];
-  Qsim::OSDomain osd(cpus, argv[1], arch, QSIM_HEADLESS, ram_mb, device_tree_path);
+  std::string qemu_shared_folder_dir_path;
+  if (arch == "xilinx_zcu102" or arch == "xilinx_zcu102_old" )
+    qemu_shared_folder_dir_path = argv[6];
+  Qsim::OSDomain osd(cpus, argv[1], arch, QSIM_HEADLESS, ram_mb, qemu_shared_folder_dir_path);
 #endif
   Magic_cb_s magic_cb_s(osd);
 
