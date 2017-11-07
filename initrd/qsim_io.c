@@ -12,6 +12,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#define DEBUG_ENABLE 1
+#include "debug_print.h"
+
 static inline void do_cpuid(uint32_t val) {
 #if defined(__aarch64__)
   asm volatile("msr pmcr_el0, %0" :: "r" (val));
@@ -51,19 +54,26 @@ static inline int do_cpuid2_return(uint32_t val, char* buf) {
 }
 
 static inline void qsim_out(char i) {
+  DB_PRINT("char is: %c",i);
   do_cpuid((0xff & i) | 0xc501e000);
+  DB_PRINT("Have write char: %c",((0xff & i) | 0xc501e000));
 }
 
 static inline void qsim_bin_out(char i) {
+  DB_PRINT("char is: %c",i);
   do_cpuid((0xff & i) | 0xc5b10000);
+  DB_PRINT("Have write char: %c",((0xff & i) | 0xc5b10000));
 }
 
 static inline char qsim_in() {
   char out;
   int ready;
+  DB_PRINT("get CPU_ID");
   ready = do_cpuid_return(0xc5b1fffe);
+  DB_PRINT("ready is: %i",ready);
   if (!ready) exit(0);
   out = do_cpuid_return(0xc5b1ffff);
+  DB_PRINT("out is: %c",out);
 
   return out;
 }
@@ -77,6 +87,7 @@ static inline size_t qsim_in_block(char* buf) {
 
 int main(int argc, char **argv) {
   int c;
+  DB_PRINT("START APLICATION");
   if (!strcmp(argv[0], "/sbin/qsim_out")) {
     while ((c = fgetc(stdin)) != EOF ) qsim_out(c);
   } else if (!strcmp(argv[0], "/sbin/qsim_bin_out")) {
@@ -87,6 +98,6 @@ int main(int argc, char **argv) {
     char buf[1024];
     while ((s = qsim_in_block(buf)) != 0) write(1, buf, s);
   }
-
+  DB_PRINT("END APLICATION");
   return 0;
 }

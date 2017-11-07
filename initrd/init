@@ -11,13 +11,25 @@ mount /sys
 
 PATH=/sbin
 
+echo DEBUG: IN AUTOSTART : START
+
+echo DEBUG: IN AUTOSTART : GET CPUS
+
 export NCPUS=`grep processor /proc/cpuinfo | wc -l`
+
+echo DEBUG: IN AUTOSTART : Number of CPUs: $NCPUS
 
 echo Number of CPUs: $NCPUS | /sbin/qsim_out
 
-cd data
+echo DEBUG: IN AUTOSTART : DATA
+
+cd /data
+
+echo DEBUG: IN AUTOSTART : CALL MARK_APP
 
 /sbin/mark_app
+
+echo DEBUG: IN AUTOSTART : CALLED MARK_APP
 
 echo Restoring state
 echo Copying benchmark binary...
@@ -40,3 +52,4 @@ echo --- program exit, will shutdown shortly... ---
 while true; do
   sleep 10
 done
+

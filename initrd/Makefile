@@ -11,8 +11,8 @@ sbin/test_mem: test_mem.c
 sbin/hexdump : sbin/busybox
 	bash -c 'cd sbin; for a in `$(QEMU) ./busybox --list-full`; do ln -sf ./busybox $$a; done; cd ..'
 
-sbin/% : %.c
-	$(CC) -o $@ -pthread -static $<
+sbin/% : %.c debug_print.h
+	$(CC) -o $@ -pthread -static debug_print.h $<
 
 dev proc sys data:
 	mkdir -p dev proc sys data
