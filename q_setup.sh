@@ -14,17 +14,17 @@ ARCH=arm64
 # build qemu
 echo -e "\n\nCLEAN QEMU"
 make clean
-make distclean
+#make distclean
 
 echo -e "\n\nBuilding QEMU"
 ./build-qemu.sh debug
-#./build-qemu.sh release
+./build-qemu.sh release
 
 # build qsim
 # copy header files to include directory
 echo -e "\n\nBuilding QSIM"
-make debug install
-#make release install
+#make debug install
+make release install
 
 #echo -e "\n\nBuilding busybox"
 #cd $QSIM_PREFIX
