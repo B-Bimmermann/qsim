@@ -220,7 +220,7 @@ const char** get_qemu_args(const char* kernel, int ram_size, int n_cpus, const s
   static const char *argv_interactive_a64[] = {
     "qemu", 
     "-m", ramsize, "-M", "virt",
-    "-cpu", "cortex-a57",
+    "-cpu", "cortex-a53",
     "-global", "virtio-blk-device.scsi=off",
     "-device", "virtio-scsi-device,id=scsi",
     "-drive",  a64_img_options,
@@ -285,7 +285,7 @@ const char** get_qemu_args(const char* kernel, int ram_size, int n_cpus, const s
   static const char *argv_headless_a64[] = {
     "qemu",
     "-m", ramsize, "-M", "virt",
-    "-cpu", "cortex-a57",
+    "-cpu", "cortex-a53",
     "-kernel", strdup(kernel),
     "-initrd", strdup((initrd_path_s+".arm64").c_str()),
     "-append", "init=/init lpj=34920500 console=ttyAMA0 console=ttyS0"
