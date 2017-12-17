@@ -17,25 +17,26 @@ echo Number of CPUs: $NCPUS | /sbin/qsim_out
 
 cd data
 
+echo "Start Simulation"
+# START Simulation
 /sbin/mark_app
 
-echo Restoring state
-echo Copying benchmark binary...
+echo "In Simulation 1"
+echo "In Simulation 2"
+echo "In Simulation 3"
+echo "In Simulation 4"
+echo "In Simulation 5"
+echo "In Simulation 6"
+echo "In Simulation 7"
+echo "In Simulation 8"
+echo "In Simulation 9"
+echo "In Simulation 10"
 
-/sbin/qsim_in | tar -x
-if [ $? != 0 ]; then
-  echo Untar input failed. Are you providing a .tar archive? | /sbin/qsim_out
-fi
-
-if [ ! -e runme.sh ]; then
-  echo \"runme.sh\" not found. Input .tar must contain this. | /sbin/qsim_out
-fi
-
-echo Executing benchmark
-/sbin/chmod +x ./runme.sh
-/sbin/ash ./runme.sh
 
 echo --- program exit, will shutdown shortly... ---
+/sbin/mark_app "END"
+
+
 # Spin forever.
 while true; do
   sleep 10
