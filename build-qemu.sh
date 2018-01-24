@@ -13,10 +13,22 @@ if [[ $1 = "debug" ]]; then
   build_dir=.dbg_build
 fi
 
+if [[ $1 = "prof" ]]; then
+  echo "make prof"
+  #enable ll debug infos
+  debug_flags="--enable-debug --enable-debug-tcg --enable-debug-info --disable-strip --disable-pie"
+  #enable grpof
+  prof_flags="--enable-gprof --enable-profiler "
+  build_dir=.prof_build
+fi
+
 if [[ $1 = "release" ]]; then
   echo "make release"
   build_dir=.opt_build
 fi
+
+
+
 
 echo "make $QSIM_PREFIX/lib/"
 mkdir -p $QSIM_PREFIX/lib/
@@ -24,7 +36,7 @@ if [ ! -d "$build_dir" ]; then
   mkdir -p $build_dir
   cd $build_dir
   echo "make QEMU FLAGS"
-  QEMU_CFLAGS="-I${QSIM_PREFIX} -g -fPIC -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wno-deprecated-declarations -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -Wendif-labels -Wmissing-include-dirs -Wempty-body -Wnested-externs -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers -Wtype-limits -fstack-protector-all -Wno-uninitialized" ../qemu/configure --extra-ldflags=-shared --target-list=aarch64-softmmu,x86_64-softmmu --disable-pie --disable-brlapi --disable-rdma --disable-rbd --disable-tcmalloc --disable-xen --disable-gtk --disable-glusterfs --disable-xfsctl $debug_flags --datadir=$QSIM_PREFIX/qemu/pc-bios --with-confsuffix=/
+  QEMU_CFLAGS="-I${QSIM_PREFIX} -g -fPIC -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wno-deprecated-declarations -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -fno-strict-aliasing -fno-common -Wendif-labels -Wmissing-include-dirs -Wempty-body -Wnested-externs -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers -Wtype-limits -fstack-protector-all -Wno-uninitialized" ../qemu/configure --extra-ldflags=-shared --target-list=aarch64-softmmu,x86_64-softmmu --disable-pie --disable-brlapi --disable-rdma --disable-rbd --disable-tcmalloc --disable-xen --disable-gtk --disable-glusterfs --disable-xfsctl $debug_flags $prof_flags --datadir=$QSIM_PREFIX/qemu/pc-bios --with-confsuffix=/
 else
   echo "enter $build_dir"
   cd $build_dir

@@ -17,6 +17,8 @@ all: libqsim.so qsim-fastforwarder
 
 debug: CXXFLAGS += -O0
 debug: BUILD_DIR = .dbg_build
+prof: CXXFLAGS += -pg 
+prof: BUILD_DIR = .prof_build
 release: CXXFLAGS += -O3
 release: BUILD_DIR = .opt_build
 
@@ -69,7 +71,10 @@ uninstall: $(QSIM_PREFIX)/lib/libqsim.so
 .PHONY: debug
 
 debug: all
-	./build-qemu.sh $@		
+	./build-qemu.sh $@	
+
+prof: all
+	./build-qemu.sh $@	
 
 .PHONY: release tests
 
@@ -117,4 +122,4 @@ clean:
 	rm -fr lib/
 
 distclean: clean
-	rm -rf .dbg_build .opt_build
+	rm -rf .dbg_build .opt_build .prof_build

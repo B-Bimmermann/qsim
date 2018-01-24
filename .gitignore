@@ -42,6 +42,7 @@ initrd/busybox-1.26.2
 include/
 .dbg_build
 .opt_build
+.prof_build
 tools
 images
 build
