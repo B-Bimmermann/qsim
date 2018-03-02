@@ -361,8 +361,6 @@ const char** get_qemu_args(const char* kernel, int ram_size, int n_cpus, const s
     "--serial", "/dev/null",
     "-machine-path", qemu_shared_folder_dir,
     (mode == QSIM_KVM) ? "--enable-kvm" : NULL,
-    "-icount", "100,sleep=off",
-    "-rtc", "clock=vm",
     NULL
   };
 
